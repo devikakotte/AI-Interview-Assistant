@@ -1,9 +1,12 @@
 import os
 import json
 import google.generativeai as genai
-import re
 from dotenv import load_dotenv
-from prompts import question_prompt, evaluation_prompt
+from prompts import (
+    question_prompt,
+    evaluation_prompt,
+    preparation_prompt
+)
 
 load_dotenv()
 
@@ -12,39 +15,33 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel(os.getenv("MODEL"))
 
 
-# ---------------------------------------------
-# Helper Function
-# ---------------------------------------------
+# -------------------------------
+# Generate Interview Questions
+# -------------------------------
 
+# -------------------------------
+# Generate Interview Questions
+# -------------------------------
 
-def clean_json(text):
-    """
-    Extract JSON even if Gemini adds extra text.
-    """
-
-    text = text.replace("```json", "")
-    text = text.replace("```", "").strip()
-
-    match = re.search(r'(\[.*\]|\{.*\})', text, re.DOTALL)
-
-    if match:
-        return match.group(1)
-
-    return text
-
-# ---------------------------------------------
-# Generate Questions
-# ---------------------------------------------
-
-def generate_questions(domain, difficulty):
+def generate_questions(domain, difficulty, interview_type):
 
     try:
 
         response = model.generate_content(
-            question_prompt(domain, difficulty)
+
+            question_prompt(
+                domain,
+                difficulty,
+                interview_type
+            )
+
         )
 
-        content = clean_json(response.text)
+        content = response.text.strip()
+
+        content = content.replace("```json", "")
+        content = content.replace("```", "")
+        content = content.strip()
 
         return json.loads(content)
 
@@ -53,11 +50,9 @@ def generate_questions(domain, difficulty):
         return {
             "error": str(e)
         }
-
-
-# ---------------------------------------------
-# Evaluate Answers
-# ---------------------------------------------
+# -------------------------------
+# Evaluate Interview
+# -------------------------------
 
 def evaluate_answers(questions, answers):
 
@@ -70,25 +65,47 @@ def evaluate_answers(questions, answers):
             )
         )
 
-        content = clean_json(response.text)
+        content = response.text.strip()
 
-        report = json.loads(content)
+        content = content.replace("```json", "")
+        content = content.replace("```", "")
+        content = content.strip()
 
-        scores = [q["score"] for q in report["questions"]]
-
-        report["overall_score"] = round(
-            sum(scores) / len(scores),
-            2
-        )
-
-        return report
+        try:
+            return json.loads(content)
+        except:
+            return {
+                "error": "Gemini returned invalid JSON.",
+                "raw": content
+            }
 
     except Exception as e:
 
         return {
-            "questions": [],
-            "strengths": [],
-            "weaknesses": [],
-            "overall_score": 0,
             "error": str(e)
         }
+
+
+# -------------------------------
+# Generate Preparation Roadmap
+# -------------------------------
+
+def generate_preparation_plan(domain, level, interview_type):
+
+    try:
+
+        response = model.generate_content(
+
+            preparation_prompt(
+                domain,
+                level,
+                interview_type
+            )
+
+        )
+
+        return response.text
+
+    except Exception as e:
+
+        return f"❌ Error:\n\n{str(e)}"

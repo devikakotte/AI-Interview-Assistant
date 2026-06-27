@@ -1,107 +1,172 @@
-import json
-
-# -----------------------------------------
-# Generate Questions Prompt
-# -----------------------------------------
-
-def question_prompt(domain, difficulty):
+def question_prompt(domain, difficulty, interview_type):
 
     return f"""
-You are an expert technical interviewer.
+You are a senior interviewer at Google, Microsoft and Amazon.
 
-Generate exactly 10 interview questions.
+Generate EXACTLY 10 interview questions.
 
-Domain: {domain}
+Domain:
+{domain}
 
-Difficulty: {difficulty}
+Difficulty:
+{difficulty}
+
+Interview Type:
+{interview_type}
 
 Rules:
-- Return ONLY JSON.
-- No markdown.
-- No explanation.
-- No extra text.
 
-Output format:
+If Interview Type is:
+
+1. Technical Interview
+- Ask theoretical questions.
+- Concepts.
+- OOP.
+- Language fundamentals.
+- APIs.
+- Frameworks.
+
+2. Coding Assessment
+- Ask coding problems ONLY.
+- Frequently asked coding interview questions.
+- Arrays
+- Strings
+- HashMaps
+- Sliding Window
+- Recursion
+- Stack
+- Queue
+- Linked List
+- Trees
+- Dynamic Programming (easy/intermediate)
+
+Do NOT ask theory.
+
+3. HR Interview
+Ask behavioural questions like
+
+- Tell me about yourself
+- Why should we hire you?
+- Biggest weakness
+- Leadership
+- Teamwork
+- Conflict
+- Failure
+- Career goals
+
+No technical questions.
+
+4. System Design
+
+Generate beginner/intermediate system design questions related to the selected domain.
+
+5. Mixed Interview
+
+Mix HR, Coding and Technical questions.
+
+Return ONLY JSON.
+
+Example:
 
 [
-    {{
-        "id":1,
-        "question":"Question text"
-    }},
-    {{
-        "id":2,
-        "question":"Question text"
-    }}
+  {{
+      "id":1,
+      "question":"Explain Python decorators."
+  }},
+  {{
+      "id":2,
+      "question":"Reverse a linked list."
+  }}
 ]
 """
 
 
-# -----------------------------------------
-# Evaluation Prompt
-# -----------------------------------------
-
 def evaluation_prompt(questions, answers):
 
-    qa = []
+    prompt = """
+You are an experienced technical interviewer.
+
+Evaluate the candidate's answers.
+
+Return ONLY valid JSON.
+
+Format:
+
+{
+    "overall_score":85,
+    "questions":[
+        {
+            "question":"Question",
+            "score":8,
+            "feedback":"Feedback"
+        }
+    ],
+    "strengths":[
+        "Strength 1",
+        "Strength 2"
+    ],
+    "weaknesses":[
+        "Weakness 1",
+        "Weakness 2"
+    ],
+    "topics_to_improve":[
+        "Topic 1",
+        "Topic 2"
+    ]
+}
+
+Questions and Answers
+
+"""
 
     for i, q in enumerate(questions):
 
-        qa.append({
-            "question": q["question"],
-            "answer": answers.get(i, "")
-        })
+        prompt += f"""
+
+Question {i+1}
+
+{q["question"]}
+
+Candidate Answer
+
+{answers.get(i, "No Answer")}
+
+"""
+
+    return prompt
+
+
+def preparation_prompt(domain, level, interview_type):
 
     return f"""
-You are a senior software engineer interviewing a candidate.
+You are an experienced FAANG interview mentor.
 
-Evaluate every answer.
+Create a complete interview preparation roadmap.
 
-Scoring:
+Domain:
+{domain}
 
-10 = Excellent
+Experience:
+{level}
 
-8-9 = Very Good
+Interview Type:
+{interview_type}
 
-6-7 = Good
+Include the following sections:
 
-4-5 = Average
+# Topics to Study
 
-2-3 = Poor
+# Coding Practice
 
-0-1 = Incorrect / Empty
+# Important Concepts
 
-Rules:
+# Mini Projects
 
-• Feedback must be under 20 words.
-• Be strict but fair.
-• Return ONLY JSON.
-• Do not use markdown.
-• Do not explain anything outside JSON.
+# Interview Tips
 
-Return EXACTLY this format:
+# Free Resources
 
-{{
-    "questions":[
-        {{
-            "score":8,
-            "feedback":"Good answer."
-        }}
-    ],
+# 7-Day Study Plan
 
-    "strengths":[
-        "Strength 1",
-        "Strength 2",
-        "Strength 3"
-    ],
-
-    "weaknesses":[
-        "Weakness 1",
-        "Weakness 2",
-        "Weakness 3"
-    ]
-}}
-
-Candidate Answers:
-
-{json.dumps(qa, indent=2)}
+Return the answer in clean Markdown format.
 """

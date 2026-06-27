@@ -36,7 +36,88 @@ st.caption("Practice technical interviews powered by AI")
 
 with st.sidebar:
 
-    st.header("Interview Settings")
+    st.title("🤖 AI Assistant")
+
+    page = st.radio(
+        "Navigation",
+        [
+            "🎤 Interview Practice",
+            "📚 Preparation Roadmap"
+        ]
+    )
+
+    st.divider()
+
+    if page == "🎤 Interview Practice":
+
+        st.header("Interview Settings")
+
+        domain = st.selectbox(
+            "Choose Domain",
+            [
+                "Python",
+                "Java",
+                "Web Development",
+                "Data Science",
+                "Machine Learning",
+                "SQL",
+                "JavaScript",
+                "React",
+                "NodeJS"
+            ]
+        )
+
+        difficulty = st.selectbox(
+            "Difficulty",
+            [
+                "Beginner",
+                "Intermediate",
+                "Advanced"
+            ]
+        )
+
+        interview_type = st.selectbox(
+            "Interview Type",
+            [
+                "Technical Interview",
+                "Coding Assessment",
+                "HR Interview",
+                "System Design",
+                "Mixed Interview"
+            ]
+        )
+
+        if st.button("🚀 Start New Interview", use_container_width=True):
+
+            with st.spinner("Generating Interview..."):
+
+                result = generate_questions(domain, difficulty,interview_type)
+
+            if isinstance(result, dict) and "error" in result:
+
+                st.error(result["error"])
+
+            else:
+
+                st.session_state.questions = result
+                st.session_state.answers = {}
+                st.session_state.current = 0
+                st.session_state.report = None
+                st.session_state.interview_completed = False
+
+                st.rerun()
+
+# -----------------------
+# Preparation Page
+# -----------------------
+
+if page == "📚 Preparation Roadmap":
+
+    from api import generate_preparation_plan
+
+    st.title("📚 Interview Preparation Roadmap")
+
+    st.write("Generate a personalized roadmap before attending an interview.")
 
     domain = st.selectbox(
         "Choose Domain",
@@ -50,11 +131,12 @@ with st.sidebar:
             "JavaScript",
             "React",
             "NodeJS"
-        ]
+        ],
+        key="prep_domain"
     )
 
-    difficulty = st.selectbox(
-        "Difficulty",
+    level = st.selectbox(
+        "Experience Level",
         [
             "Beginner",
             "Intermediate",
@@ -62,26 +144,30 @@ with st.sidebar:
         ]
     )
 
-    if st.button("🚀 Start New Interview", use_container_width=True):
+    interview_type = st.selectbox(
+    "Interview Type",
+    [
+        "Technical Interview",
+        "Coding Assessment",
+        "HR Interview",
+        "System Design",
+        "Mixed Interview"
+    ]
+)
 
-        with st.spinner("Generating Interview..."):
+    if st.button("📚 Generate Preparation Plan"):
 
-            result = generate_questions(domain, difficulty)
+        with st.spinner("Generating Roadmap..."):
 
-        if isinstance(result, dict) and "error" in result:
+            plan = generate_preparation_plan(
+                domain,
+                level,
+                interview_type
+            )
 
-            st.error(result["error"])
+        st.markdown(plan)
 
-        else:
-
-            st.session_state.questions = result
-            st.session_state.answers = {}
-            st.session_state.current = 0
-            st.session_state.report = None
-            st.session_state.interview_completed = False
-
-            st.rerun()
-
+    st.stop()
 # -----------------------
 # No Questions
 # -----------------------
