@@ -139,34 +139,140 @@ Candidate Answer
 def preparation_prompt(domain, level, interview_type):
 
     return f"""
-You are an experienced FAANG interview mentor.
+You are an expert technical mentor from Google, Amazon and Microsoft.
 
-Create a complete interview preparation roadmap.
+Create a COMPLETE interview preparation roadmap.
 
-Domain:
-{domain}
+Domain: {domain}
 
-Experience:
-{level}
+Candidate Level: {level}
 
-Interview Type:
-{interview_type}
+Interview Type: {interview_type}
 
-Include the following sections:
+--------------------------------------------
 
-# Topics to Study
+If Interview Type is Technical Interview:
 
-# Coding Practice
+For every topic provide:
 
-# Important Concepts
+- Topic Name
+- Why this topic is important
+- Key concepts to study
+- Frequently asked interview questions
+- Common mistakes
 
-# Mini Projects
+--------------------------------------------
 
-# Interview Tips
+If Interview Type is Coding Assessment:
 
-# Free Resources
+Generate 10 important coding topics.
 
-# 7-Day Study Plan
+For EVERY topic provide:
 
-Return the answer in clean Markdown format.
+1. Topic Name
+
+2. Why it is important
+
+3. A small code snippet (10-15 lines maximum).
+
+IMPORTANT:
+The code snippet MUST be written in the selected domain/language.
+
+Examples:
+- If domain is Python → use Python.
+- If domain is Java → use Java.
+- If domain is JavaScript → use JavaScript.
+- If domain is React → use React JSX.
+- If domain is NodeJS → use JavaScript (Node.js).
+- If domain is SQL → use SQL queries.
+- If domain is Web Development → use HTML/CSS/JavaScript depending on the topic.
+- If domain is Data Science → use Python with pandas/numpy/sklearn where appropriate.
+- If domain is Machine Learning → use Python with scikit-learn or TensorFlow where appropriate.
+
+Do NOT use Python for every domain.
+
+4. 2-3 famous interview questions with difficulty labels:
+
+🟢 Easy
+
+🟡 Medium
+
+🔴 Hard
+
+5. Common mistakes
+
+6. Tips to solve faster
+
+Example format:
+
+# Arrays
+
+Why learn?
+
+Arrays are one of the most common data structures asked in coding interviews.
+
+Example Code:
+
+nums = [1, 2, 3]
+
+for num in nums:
+    print(num)
+
+Practice Problems
+
+🟢 Two Sum
+
+🟢 Move Zeroes
+
+🟡 Best Time to Buy and Sell Stock
+
+Common Mistakes
+
+- Forgetting edge cases
+- Index out of bounds
+
+Tips
+
+- Dry run on paper
+- Think about time complexity
+
+--------------------------------------------
+
+If Interview Type is HR Interview:
+
+Generate 10 HR interview questions.
+
+For every question provide:
+
+- Why interviewer asks it
+- How to answer
+- Sample answer
+- Mistakes to avoid
+
+--------------------------------------------
+
+If Interview Type is System Design:
+
+Generate a roadmap containing:
+
+- Important concepts
+- Architecture explanation
+- Real-world examples
+- Frequently asked interview questions
+- Beginner resources
+
+--------------------------------------------
+
+If Interview Type is Mixed Interview:
+
+Include all of these:
+
+- Technical topics
+- Coding topics with small code snippets
+- HR preparation
+- System Design basics
+
+Use proper Markdown headings, bullet points and spacing.
+
+Make the roadmap detailed, practical and interview-focused.
 """
